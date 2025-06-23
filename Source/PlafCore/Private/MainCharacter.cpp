@@ -5,8 +5,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "MCAbilitySystemComponent.h"
+#include "AbilitySystemComponent.h"
 #include "MCAttributeSet.h"
+#include "GAS/GA_Attack.h"
+#include "MCAbilityInputID.h"
+
+#include "Log.h"
 
 AMainCharacter::AMainCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -22,8 +26,9 @@ AMainCharacter::AMainCharacter(const FObjectInitializer& ObjectInitializer) : Su
     bUseControllerRotationYaw = false;
     GetCharacterMovement()->bOrientRotationToMovement = true;
 
-    AbilitySystem = CreateDefaultSubobject<UMCAbilitySystemComponent>(TEXT("AbilitySystem"));
+    AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
     Attributes = CreateDefaultSubobject<UMCAttributeSet>(TEXT("Attributes"));
+    AbilitySystem->AddAttributeSetSubobject(Attributes);
 }
 
 void AMainCharacter::BeginPlay()
@@ -37,6 +42,8 @@ void AMainCharacter::BeginPlay()
 	{
 		Subsystem->AddMappingContext(MappingContext, 0);
 	}
+
+	AbilitySystem->GiveAbility(FGameplayAbilitySpec(AttackAbilityClass, 1, static_cast<int32>(EAbilityInputID::Attack)));
 }
 
 void AMainCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -48,6 +55,7 @@ void AMainCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move);
 	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacter::Look);
+	Input->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMainCharacter::BasicAttack);
 }
 
 UAbilitySystemComponent* AMainCharacter::GetAbilitySystemComponent() const
@@ -75,4 +83,9 @@ void AMainCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void AMainCharacter::BasicAttack(const FInputActionValue& Value)
+{
+	AbilitySystem->TryActivateAbilityByClass(AttackAbilityClass);
 }
