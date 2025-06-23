@@ -6,9 +6,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemComponent.h"
-#include "MCAttributeSet.h"
+#include "GAS/MCAttributeSet.h"
 #include "GAS/GA_Attack.h"
-#include "MCAbilityInputID.h"
+#include "GAS/MCAbilityInputID.h"
 
 #include "Log.h"
 

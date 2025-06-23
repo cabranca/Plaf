@@ -2,7 +2,7 @@
 
 #include "GameFramework/Character.h"
 #include "AbilitySystemComponent.h"
-#include "MCAbilityInputID.h"
+#include "GAS/MCAbilityInputID.h"
 #include "Log.h"
 
 UGA_Attack::UGA_Attack()
