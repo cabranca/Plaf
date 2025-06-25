@@ -5,14 +5,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "AbilitySystemComponent.h"
-#include "GAS/MCAttributeSet.h"
-#include "GAS/GA_Attack.h"
-#include "GAS/MCAbilityInputID.h"
+#include "UI/GameplayHUD.h"
 
 #include "Log.h"
 
-AMainCharacter::AMainCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+AMainCharacter::AMainCharacter()
 {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
     CameraBoom->SetupAttachment(RootComponent);
@@ -25,10 +22,6 @@ AMainCharacter::AMainCharacter(const FObjectInitializer& ObjectInitializer) : Su
 
     bUseControllerRotationYaw = false;
     GetCharacterMovement()->bOrientRotationToMovement = true;
-
-    AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
-    Attributes = CreateDefaultSubobject<UMCAttributeSet>(TEXT("Attributes"));
-    AbilitySystem->AddAttributeSetSubobject(Attributes);
 }
 
 void AMainCharacter::BeginPlay()
@@ -43,7 +36,9 @@ void AMainCharacter::BeginPlay()
 		Subsystem->AddMappingContext(MappingContext, 0);
 	}
 
-	AbilitySystem->GiveAbility(FGameplayAbilitySpec(AttackAbilityClass, 1, static_cast<int32>(EAbilityInputID::Attack)));
+	GiveDefaultAbilities();
+	InitDefaultAttributes();
+	InitHUD();
 }
 
 void AMainCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -55,12 +50,6 @@ void AMainCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move);
 	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainCharacter::Look);
-	Input->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMainCharacter::BasicAttack);
-}
-
-UAbilitySystemComponent* AMainCharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystem;
 }
 
 void AMainCharacter::Move(const FInputActionValue& Value)
@@ -85,7 +74,13 @@ void AMainCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
-void AMainCharacter::BasicAttack(const FInputActionValue& Value)
+void AMainCharacter::InitHUD() const
 {
-	AbilitySystem->TryActivateAbilityByClass(AttackAbilityClass);
+	if(const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if(AGameplayHUD* GameplayHUD = Cast<AGameplayHUD>(PlayerController->GetHUD()))
+		{
+			GameplayHUD->Init();
+		}
+	}
 }

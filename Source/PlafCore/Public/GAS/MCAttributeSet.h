@@ -10,12 +10,20 @@
     GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
     GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+#define NUMERIC_VALUE(AttributeSetName, PropertyName) \
+    AttributeSetName->Get##PropertyName##Attribute().GetNumericValue(AttributeSetName)
+
 UCLASS()
 class UMCAttributeSet : public UAttributeSet
 {
     GENERATED_BODY()
 
 public:
+    UMCAttributeSet();
+
+    virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+    virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
     UPROPERTY(BlueprintReadOnly, Category = "Attributes|Health")
     FGameplayAttributeData Health;
     ATTRIBUTE_ACCESSORS(UMCAttributeSet, Health)

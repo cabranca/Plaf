@@ -6,7 +6,7 @@ public class PlafCore : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "EnhancedInput", "GameplayAbilities", "GameplayTasks", "GameplayTags" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "EnhancedInput", "GameplayAbilities", "GameplayTasks", "GameplayTags", "UMG" });
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 	}
 }
